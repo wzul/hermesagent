@@ -59,6 +59,8 @@ RUN mkdir -p $HERMES_HOME/cron \
     $HERMES_HOME/skills \
     $HERMES_HOME/whatsapp/session && \
     cp cli-config.yaml.example $HERMES_HOME/config.yaml && \
+    sed -i 's/default: "anthropic\/claude-opus-4.6"/default: "gemini-3-flash-preview"/' $HERMES_HOME/config.yaml && \
+    sed -i 's/provider: "auto"/provider: "main"/' $HERMES_HOME/config.yaml && \
     chown -R hermes:hermes /home/hermes /opt/hermes-agent
 
 # Switch to the non-root user

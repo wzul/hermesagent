@@ -11,14 +11,15 @@ services:
       - hermes_data:/home/hermes/.hermes
     environment:
       # --- REQUIRED: LLM PROVIDER (Ollama Cloud) ---
-      # Defaulting to gemini-3-flash-preview as requested
+      # Explicitly set the provider to 'main' to use OPENAI_BASE_URL
+      - HERMES_INFERENCE_PROVIDER=${HERMES_INFERENCE_PROVIDER:-main}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://ollama.com/v1}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Default to gemini-3-flash-preview as requested
       - LLM_MODEL=${LLM_MODEL:-gemini-3-flash-preview}
-      - HERMES_INFERENCE_PROVIDER=${HERMES_INFERENCE_PROVIDER:-main}
       
       # --- BROWSER SIDECAR CONFIG ---
-      # Configure Playwright to use the browserless container instead of local install
+      # Configure Playwright to use the browserless container
       - PLAYWRIGHT_REMOTE_ENDPOINT=ws://browserless:3000
       
       # --- OPTIONAL: MESSAGING PLATFORMS ---
@@ -43,11 +44,9 @@ services:
       - GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
 
   # Playwright Sidecar: Browserless Chrome
-  # This container handles all the heavy browser rendering
   browserless:
     image: browserless/chrome:latest
     restart: unless-stopped
-    # Port 3000 is used internally by the agent via the service name 'browserless'
     environment:
       - TOKEN=${BROWSERLESS_TOKEN:-}
       - PREBOOT_CHROME=true

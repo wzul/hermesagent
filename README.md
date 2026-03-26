@@ -26,6 +26,11 @@ The agent is pre-configured to use **Ollama Cloud** by default, but you should f
 | `OPENAI_API_KEY` | Your API Key | `your-api-key` |
 | `HERMES_INFERENCE_PROVIDER` | Provider mode | `main` |
 
+### 🐻 Personality: Bear-Kawaii (Kuma-chan)
+A custom technical bear personality is pre-configured! ʕ•ᴥ•ʔ
+- **How to activate**: Run `/personality bear_kawaii` in chat.
+- **Vibe**: Expert coder, fluffy, loves honey, and uses bear-y many puns. kuma~
+
 ### 🤖 Setting your Model
 To select your specific model (e.g. `gemini-3-flash-preview`), use the interactive setup inside the container:
 

@@ -14,16 +14,24 @@ This configuration uses a **Sidecar Pattern** to keep the agent lightweight:
 3.  **Environment Variables**: Add the required keys in the Dokploy UI (see below).
 4.  **Deployment**: Click deploy. Dokploy will automatically build the image and orchestrate the two containers.
 
-## 🔑 Required Environment Variables
+## 🔑 Required Configuration
 
-The agent is pre-configured to use **Ollama Cloud** by default.
+The agent is pre-configured to use **Ollama Cloud** by default, but you should finalize your model selection via the CLI.
+
+### Environment Variables
 
 | Variable | Description | Default / Example |
 | :--- | :--- | :--- |
 | `OPENAI_BASE_URL` | LLM API endpoint | `https://ollama.com/v1` |
 | `OPENAI_API_KEY` | Your API Key | `your-api-key` |
-| `LLM_MODEL` | Default model name | `gemini-3-flash-preview` |
 | `HERMES_INFERENCE_PROVIDER` | Provider mode | `main` |
+
+### 🤖 Setting your Model
+To select your specific model (e.g. `gemini-3-flash-preview`), use the interactive setup inside the container:
+
+1.  Open the Dokploy terminal for the `hermes-agent` container.
+2.  Run: `hermes model`
+3.  Follow the prompts to select your provider and model.
 
 ### Messaging Platforms (Pick at least one)
 

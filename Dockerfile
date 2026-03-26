@@ -9,9 +9,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/usr/local/bin:/home/hermes/.local/bin:$PATH"
 
 # Install system dependencies
-# Includes: git, curl, build-essential for compilation, 
-# ripgrep for file search, ffmpeg for voice/audio,
-# and libraries required by Playwright (Chromium)
+# Only includes core tools needed for the agent logic and builds.
+# Heavy browser-specific GUI libraries (libnss3, libgbm1, etc.) are removed 
+# as Playwright will connect to a remote sidecar (e.g., browserless/chrome).
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
@@ -21,17 +21,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     ripgrep \
     ffmpeg \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdrm2 \
-    libxkbcommon0 \
-    libmesa-glx \
-    libgbm1 \
-    libasound2 \
-    libpango-1.0-0 \
-    libcairo2 \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -47,15 +36,15 @@ WORKDIR /opt/hermes-agent
 RUN git clone https://github.com/NousResearch/hermes-agent.git .
 
 # Install Python dependencies using uv
-# We install with [all] to include browser, voice, and gateway tools
+# We install with [all] to include voice and gateway tools
 RUN uv pip install --system -e ".[all]"
 
-# Install Node.js dependencies (required for browser tools and WhatsApp)
+# Install Node.js dependencies (required for browser tools bridge and WhatsApp)
 RUN npm install && \
     cd scripts/whatsapp-bridge && npm install
 
-# Install Playwright browser engine
-RUN npx playwright install chromium
+# NOTE: We specifically skip 'npx playwright install' and system-level browser deps.
+# The agent must be configured to use a remote Playwright endpoint via environment variables.
 
 # Set up the .hermes data directory with correct permissions
 RUN mkdir -p $HERMES_HOME/cron \
@@ -78,6 +67,5 @@ WORKDIR /home/hermes
 # The entrypoint is the hermes command
 ENTRYPOINT ["hermes"]
 
-# Default command starts the messaging gateway, which is ideal for Docker/Dokploy
-# Users can override this to run 'chat' or other commands
+# Default command starts the messaging gateway
 CMD ["gateway"]

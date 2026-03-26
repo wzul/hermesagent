@@ -1,11 +1,11 @@
-# Hermes Agent - Docker & Dokploy Deployment
+# Hermes Agent - Docker & Dokploy Deployment (Sidecar Edition)
 
-This repository provides a `Dockerfile` and `docker-compose.yml` to run [Hermes Agent](https://github.com/NousResearch/hermes-agent) in a containerized environment. This setup is optimized for **Dokploy** or any standard Docker-based hosting provider.
+This repository provides a optimized `Dockerfile` and `docker-compose.yml` to run [Hermes Agent](https://github.com/NousResearch/hermes-agent) in a containerized environment. This version uses a **Browserless Sidecar** for Playwright, which keeps the main agent image lightweight and separates the heavy browser rendering into a dedicated container.
 
 ## 🚀 Quick Start
 
 1.  **Clone this configuration** to your server or local machine.
-2.  **Create an `.env` file** based on the environment variables section below.
+2.  **Create an `.env` file** (see Environment Variables below).
 3.  **Deploy with Docker Compose**:
     ```bash
     docker-compose up -d
@@ -16,17 +16,23 @@ This repository provides a `Dockerfile` and `docker-compose.yml` to run [Hermes 
 1.  **Create a New Service** in Dokploy.
 2.  **Select Docker Compose** as the deployment type.
 3.  **Paste the contents** of the provided `docker-compose.yml`.
-4.  **Add Environment Variables** in the Dokploy dashboard (see below).
-5.  **Persistent Storage**: Dokploy will automatically handle the `hermes_data` volume to ensure your sessions, memories, and skills persist across restarts.
+4.  **Add Environment Variables** in the Dokploy dashboard.
+5.  **Persistent Storage**: Dokploy will manage the `hermes_data` volume to ensure your sessions, memories, and skills persist across restarts.
+
+## 🏗 Architecture: Playwright Sidecar
+
+The agent is configured to use `browserless/chrome` as a sidecar. 
+
+- **Hermes Agent Container**: Contains only the Python/Node logic. No heavy GUI libraries or Chromium binaries are installed here.
+- **Browserless Container**: A dedicated, optimized headless Chrome instance. 
+- **Communication**: The agent connects via WebSockets (`ws://browserless:3000`).
 
 ## 🔑 Required Environment Variables
-
-To function, Hermes needs at least one LLM provider (OpenRouter is recommended).
 
 | Variable | Description | Source |
 | :--- | :--- | :--- |
 | `OPENROUTER_API_KEY` | Your OpenRouter API Key | [openrouter.ai](https://openrouter.ai/keys) |
-| `LLM_MODEL` | Default model (e.g., `anthropic/claude-3.5-sonnet`) | [openrouter.ai/models](https://openrouter.ai/models) |
+| `LLM_MODEL` | Default model (e.g., `google/gemini-3-flash-preview`) | [openrouter.ai/models](https://openrouter.ai/models) |
 
 ### Messaging Platforms (Pick at least one)
 
@@ -40,33 +46,22 @@ To function, Hermes needs at least one LLM provider (OpenRouter is recommended).
 
 ## 📱 WhatsApp Pairing
 
-If you enable WhatsApp (`WHATSAPP_ENABLED=true`), you must pair the device manually after the container starts:
+If you enable WhatsApp (`WHATSAPP_ENABLED=true`):
 
-1.  Run the pairing command:
+1.  Run the pairing command in the agent container:
     ```bash
     docker exec -it hermes-agent hermes whatsapp
     ```
-2.  **Scan the QR Code** that appears in your terminal with your phone.
-3.  The session will be saved in the persistent volume.
+2.  **Scan the QR Code** in your terminal with your phone.
 
 ## 📁 Persistent Data
 
-The container stores all its state in `/home/hermes/.hermes`. In the `docker-compose.yml`, this is mapped to a named volume `hermes_data`. This includes:
-
-*   **Sessions**: Past conversation history.
-*   **Memories**: Learnt facts about you and the environment.
-*   **Skills**: Custom tools the agent has created.
+The volume `hermes_data` persists:
+*   **Sessions**: Conversation history.
+*   **Memories**: Learnt facts about you.
+*   **Skills**: Custom tools created by the agent.
 *   **Logs**: Detailed execution trajectories.
-*   **Config**: Your `config.yaml` is initialized here on first run.
-
-## 🖥 Local CLI Usage
-
-If you want to use the interactive CLI instead of the messaging gateway:
-
-```bash
-docker run -it --env-file .env -v hermes_data:/home/hermes/.hermes hermes-agent:latest chat
-```
 
 ## 🛡 Security Note
 
-By default, `GATEWAY_ALLOW_ALL_USERS` is set to `false`. Ensure you provide your User ID in `TELEGRAM_ALLOWED_USERS` (or equivalent) so that only you can interact with your agent.
+Ensure you set `TELEGRAM_ALLOWED_USERS` (or platform equivalent) to prevent unauthorized access to your agent and your LLM credits.

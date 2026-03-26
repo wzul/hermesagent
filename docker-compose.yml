@@ -6,6 +6,8 @@ services:
     image: hermes-agent:latest
     container_name: hermes-agent
     restart: unless-stopped
+    depends_on:
+      - browserless
     volumes:
       # Persist all sessions, memories, logs, and skills
       - hermes_data:/home/hermes/.hermes
@@ -14,16 +16,15 @@ services:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - LLM_MODEL=${LLM_MODEL:-google/gemini-3-flash-preview}
       
+      # --- BROWSER SIDECAR CONFIG ---
+      # Configure Playwright to use the browserless container instead of local install
+      - PLAYWRIGHT_REMOTE_ENDPOINT=ws://browserless:3000
+      
       # --- OPTIONAL: MESSAGING PLATFORMS ---
-      # Telegram
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_ALLOWED_USERS=${TELEGRAM_ALLOWED_USERS}
-      
-      # Discord
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
       - DISCORD_ALLOWED_USERS=${DISCORD_ALLOWED_USERS}
-      
-      # Slack
       - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
       - SLACK_APP_TOKEN=${SLACK_APP_TOKEN}
       - SLACK_ALLOWED_USERS=${SLACK_ALLOWED_USERS}
@@ -40,9 +41,21 @@ services:
       # Security: Only allow specific users by default
       - GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
 
-    # Use the default CMD ["gateway"] from Dockerfile
-    # To run a specific command, override here:
-    # command: ["chat", "--model", "anthropic/claude-3-5-sonnet"]
+  # Playwright Sidecar: Browserless Chrome
+  # This container handles all the heavy browser rendering
+  browserless:
+    image: browserless/chrome:latest
+    container_name: hermes-browserless
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Optional: Add a token for basic auth
+      - TOKEN=${BROWSERLESS_TOKEN:-}
+      # Speed up by skipping certain features if not needed
+      - PREBOOT_CHROME=true
+      - MAX_CONCURRENT_SESSIONS=5
+      - CONNECTION_TIMEOUT=300000
 
 volumes:
   hermes_data:

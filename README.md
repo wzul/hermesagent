@@ -29,10 +29,12 @@ The agent is configured to use `browserless/chrome` as a sidecar.
 
 ## 🔑 Required Environment Variables
 
-| Variable | Description | Source |
+| Variable | Description | Default / Example |
 | :--- | :--- | :--- |
-| `OPENROUTER_API_KEY` | Your OpenRouter API Key | [openrouter.ai](https://openrouter.ai/keys) |
-| `LLM_MODEL` | Default model (e.g., `google/gemini-3-flash-preview`) | [openrouter.ai/models](https://openrouter.ai/models) |
+| `OPENAI_BASE_URL` | Ollama Cloud API endpoint | `https://ollama.com/v1` |
+| `OPENAI_API_KEY` | Your Ollama Cloud API Key | `your-api-key` |
+| `LLM_MODEL` | Default model name | `llama3.1` |
+| `HERMES_INFERENCE_PROVIDER` | Set to `main` for Ollama Cloud | `main` |
 
 ### Messaging Platforms (Pick at least one)
 

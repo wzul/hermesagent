@@ -12,9 +12,11 @@ services:
       # Persist all sessions, memories, logs, and skills
       - hermes_data:/home/hermes/.hermes
     environment:
-      # --- REQUIRED: LLM PROVIDER ---
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - LLM_MODEL=${LLM_MODEL:-google/gemini-3-flash-preview}
+      # --- REQUIRED: LLM PROVIDER (Ollama Cloud) ---
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://ollama.com/v1}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-llama3.1}
+      - HERMES_INFERENCE_PROVIDER=main
       
       # --- BROWSER SIDECAR CONFIG ---
       # Configure Playwright to use the browserless container instead of local install

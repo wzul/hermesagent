@@ -1,69 +1,49 @@
-# Hermes Agent - Docker & Dokploy Deployment (Sidecar Edition)
+# Hermes Agent - Docker & Dokploy Deployment
 
-This repository provides a optimized `Dockerfile` and `docker-compose.yml` to run [Hermes Agent](https://github.com/NousResearch/hermes-agent) in a containerized environment. This version uses a **Browserless Sidecar** for Playwright, which keeps the main agent image lightweight and separates the heavy browser rendering into a dedicated container.
+This repository provides a streamlined `Dockerfile` and `docker-compose.yml` optimized for running [Hermes Agent](https://github.com/NousResearch/hermes-agent) on **Dokploy**. 
 
-## 🚀 Quick Start
+## 🏗 Architecture: Sidecar Setup
+This configuration uses a **Sidecar Pattern** to keep the agent lightweight:
+- **Hermes Agent**: Handles LLM logic, messaging, and tool orchestration.
+- **Browserless Sidecar**: A dedicated container for Playwright/Chrome, handling all web scraping and browser automation.
 
-1.  **Clone this configuration** to your server or local machine.
-2.  **Create an `.env` file** (see Environment Variables below).
-3.  **Deploy with Docker Compose**:
-    ```bash
-    docker-compose up -d
-    ```
+## 🚀 Dokploy Deployment Guide
 
-## 🛠 Dokploy Deployment
-
-1.  **Create a New Service** in Dokploy.
-2.  **Select Docker Compose** as the deployment type.
-3.  **Paste the contents** of the provided `docker-compose.yml`.
-4.  **Add Environment Variables** in the Dokploy dashboard.
-5.  **Persistent Storage**: Dokploy will manage the `hermes_data` volume to ensure your sessions, memories, and skills persist across restarts.
-
-## 🏗 Architecture: Playwright Sidecar
-
-The agent is configured to use `browserless/chrome` as a sidecar. 
-
-- **Hermes Agent Container**: Contains only the Python/Node logic. No heavy GUI libraries or Chromium binaries are installed here.
-- **Browserless Container**: A dedicated, optimized headless Chrome instance. 
-- **Communication**: The agent connects via WebSockets (`ws://browserless:3000`).
+1.  **Create a New Service**: In Dokploy, create a new service and select **Docker Compose**.
+2.  **Configuration**: Paste the contents of the `docker-compose.yml` from this repository.
+3.  **Environment Variables**: Add the required keys in the Dokploy UI (see below).
+4.  **Deployment**: Click deploy. Dokploy will automatically build the image and orchestrate the two containers.
 
 ## 🔑 Required Environment Variables
 
+The agent is pre-configured to use **Ollama Cloud** by default.
+
 | Variable | Description | Default / Example |
 | :--- | :--- | :--- |
-| `OPENAI_BASE_URL` | Ollama Cloud API endpoint | `https://ollama.com/v1` |
-| `OPENAI_API_KEY` | Your Ollama Cloud API Key | `your-api-key` |
-| `LLM_MODEL` | Default model name | `llama3.1` |
-| `HERMES_INFERENCE_PROVIDER` | Set to `main` for Ollama Cloud | `main` |
+| `OPENAI_BASE_URL` | LLM API endpoint | `https://ollama.com/v1` |
+| `OPENAI_API_KEY` | Your API Key | `your-api-key` |
+| `LLM_MODEL` | Default model name | `gemini-3-flash-preview` |
+| `HERMES_INFERENCE_PROVIDER` | Provider mode | `main` |
 
 ### Messaging Platforms (Pick at least one)
 
 | Variable | Description |
 | :--- | :--- |
 | `TELEGRAM_BOT_TOKEN` | Token from @BotFather |
+| `TELEGRAM_ALLOWED_USERS` | Your Telegram User ID (Required for security) |
 | `DISCORD_BOT_TOKEN` | Token from Discord Developer Portal |
-| `SLACK_BOT_TOKEN` | `xoxb-...` token |
-| `SLACK_APP_TOKEN` | `xapp-...` token (Socket Mode) |
-| `TELEGRAM_ALLOWED_USERS`| Comma-separated User IDs (Highly Recommended) |
+| `SLACK_BOT_TOKEN` | Slack `xoxb` token |
 
 ## 📱 WhatsApp Pairing
 
-If you enable WhatsApp (`WHATSAPP_ENABLED=true`):
+If `WHATSAPP_ENABLED=true` is set:
 
-1.  Run the pairing command in the agent container:
-    ```bash
-    docker exec -it hermes-agent hermes whatsapp
-    ```
-2.  **Scan the QR Code** in your terminal with your phone.
+1.  Open the Dokploy terminal for the `hermes-agent` container.
+2.  Run: `hermes whatsapp`
+3.  Scan the QR code displayed in the logs/terminal with your phone.
 
 ## 📁 Persistent Data
+All agent state (sessions, memories, and skills) is stored in the `hermes_data` volume. This ensures your agent "remembers" you and retains its learned skills even if the container is redeployed or updated.
 
-The volume `hermes_data` persists:
-*   **Sessions**: Conversation history.
-*   **Memories**: Learnt facts about you.
-*   **Skills**: Custom tools created by the agent.
-*   **Logs**: Detailed execution trajectories.
-
-## 🛡 Security Note
-
-Ensure you set `TELEGRAM_ALLOWED_USERS` (or platform equivalent) to prevent unauthorized access to your agent and your LLM credits.
+## 🛡 Security
+**Important:** Always set `TELEGRAM_ALLOWED_USERS` (or the equivalent for your platform). By default, the gateway denies all users unless they are explicitly in the allowlist to protect your API credits and data.

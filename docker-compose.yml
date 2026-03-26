@@ -3,8 +3,6 @@ version: '3.8'
 services:
   hermes-agent:
     build: .
-    image: hermes-agent:latest
-    container_name: hermes-agent
     restart: unless-stopped
     depends_on:
       - browserless
@@ -13,10 +11,11 @@ services:
       - hermes_data:/home/hermes/.hermes
     environment:
       # --- REQUIRED: LLM PROVIDER (Ollama Cloud) ---
+      # Defaulting to gemini-3-flash-preview as requested
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://ollama.com/v1}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - LLM_MODEL=${LLM_MODEL:-llama3.1}
-      - HERMES_INFERENCE_PROVIDER=main
+      - LLM_MODEL=${LLM_MODEL:-gemini-3-flash-preview}
+      - HERMES_INFERENCE_PROVIDER=${HERMES_INFERENCE_PROVIDER:-main}
       
       # --- BROWSER SIDECAR CONFIG ---
       # Configure Playwright to use the browserless container instead of local install
@@ -31,7 +30,7 @@ services:
       - SLACK_APP_TOKEN=${SLACK_APP_TOKEN}
       - SLACK_ALLOWED_USERS=${SLACK_ALLOWED_USERS}
       
-      # WhatsApp (requires pairing via 'docker exec -it hermes-agent hermes whatsapp')
+      # WhatsApp (requires pairing via 'docker exec -it <container_id> hermes whatsapp')
       - WHATSAPP_ENABLED=${WHATSAPP_ENABLED:-false}
       
       # --- OPTIONAL: TOOLS & FEATURES ---
@@ -47,14 +46,10 @@ services:
   # This container handles all the heavy browser rendering
   browserless:
     image: browserless/chrome:latest
-    container_name: hermes-browserless
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    # Port 3000 is used internally by the agent via the service name 'browserless'
     environment:
-      # Optional: Add a token for basic auth
       - TOKEN=${BROWSERLESS_TOKEN:-}
-      # Speed up by skipping certain features if not needed
       - PREBOOT_CHROME=true
       - MAX_CONCURRENT_SESSIONS=5
       - CONNECTION_TIMEOUT=300000

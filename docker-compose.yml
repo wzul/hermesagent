@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  hermes-agent:
+    build: .
+    image: hermes-agent:latest
+    container_name: hermes-agent
+    restart: unless-stopped
+    volumes:
+      # Persist all sessions, memories, logs, and skills
+      - hermes_data:/home/hermes/.hermes
+    environment:
+      # --- REQUIRED: LLM PROVIDER ---
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-google/gemini-3-flash-preview}
+      
+      # --- OPTIONAL: MESSAGING PLATFORMS ---
+      # Telegram
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_ALLOWED_USERS=${TELEGRAM_ALLOWED_USERS}
+      
+      # Discord
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - DISCORD_ALLOWED_USERS=${DISCORD_ALLOWED_USERS}
+      
+      # Slack
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      - SLACK_APP_TOKEN=${SLACK_APP_TOKEN}
+      - SLACK_ALLOWED_USERS=${SLACK_ALLOWED_USERS}
+      
+      # WhatsApp (requires pairing via 'docker exec -it hermes-agent hermes whatsapp')
+      - WHATSAPP_ENABLED=${WHATSAPP_ENABLED:-false}
+      
+      # --- OPTIONAL: TOOLS & FEATURES ---
+      - BROWSERBASE_API_KEY=${BROWSERBASE_API_KEY}
+      - FAL_KEY=${FAL_KEY}
+      - PARALLEL_API_KEY=${PARALLEL_API_KEY}
+      - VOICE_TOOLS_OPENAI_KEY=${VOICE_TOOLS_OPENAI_KEY}
+      
+      # Security: Only allow specific users by default
+      - GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
+
+    # Use the default CMD ["gateway"] from Dockerfile
+    # To run a specific command, override here:
+    # command: ["chat", "--model", "anthropic/claude-3-5-sonnet"]
+
+volumes:
+  hermes_data:
+    driver: local

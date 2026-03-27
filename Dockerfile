@@ -58,7 +58,6 @@ RUN mkdir -p $HERMES_HOME/cron \
     $HERMES_HOME/memories \
     $HERMES_HOME/skills \
     $HERMES_HOME/whatsapp/session && \
-    cp cli-config.yaml.example $HERMES_HOME/config.yaml && \
     chown -R hermes:hermes /home/hermes /opt/hermes-agent
 
 # Switch to the non-root user

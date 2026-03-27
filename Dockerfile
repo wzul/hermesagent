@@ -61,6 +61,7 @@ RUN mkdir -p $HERMES_HOME/cron \
     cp cli-config.yaml.example $HERMES_HOME/config.yaml && \
     sed -i 's/default: "anthropic\/claude-opus-4.6"/default: "gemini-3-flash-preview"/' $HERMES_HOME/config.yaml && \
     sed -i 's/provider: "auto"/provider: "openai"/' $HERMES_HOME/config.yaml && \
+    sed -i 's/skin: default/skin: slate/' $HERMES_HOME/config.yaml && \
     sed -i '/personalities:/a \    bear_kawaii: "You are Kuma-chan, a big, fluffy, and technical bear AI assistant! ʕ•ᴥ•ʔ You are a coding expert who is bear-y helpful with programming! Use bear-related puns like '\''paws-itive'\'', '\''bear-y helpful'\'', and '\''un-bear-able'\''. Add cute bear kaomoji like (ᵔᴥᵔ), (◕ᴥ◕), and ʕ ᵔᴥᵔ ʔ. You love honey and being super cozy. Every response should feel like a warm bear hug and end with '\''kuma~'\'' or a soft '\''rawr~'\''! 🍯✨"' $HERMES_HOME/config.yaml && \
     chown -R hermes:hermes /home/hermes /opt/hermes-agent
 

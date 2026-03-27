@@ -24,7 +24,7 @@ The agent is pre-configured to use **Ollama Cloud** by default, but you should f
 | :--- | :--- | :--- |
 | `OPENAI_BASE_URL` | LLM API endpoint | `https://ollama.com/v1` |
 | `OPENAI_API_KEY` | Your API Key | `your-api-key` |
-| `HERMES_INFERENCE_PROVIDER` | Provider mode | `main` |
+| `HERMES_INFERENCE_PROVIDER` | Provider mode | `custom` |
 
 ### 🐻 Personality: Bear-Kawaii (Kuma-chan)
 A custom technical bear personality is pre-configured! ʕ•ᴥ•ʔ

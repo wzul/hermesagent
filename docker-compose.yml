@@ -11,8 +11,8 @@ services:
       - hermes_data:/home/hermes/.hermes
     environment:
       # --- REQUIRED: LLM PROVIDER (Ollama Cloud) ---
-      # Explicitly set the provider to 'main' to use OPENAI_BASE_URL
-      - HERMES_INFERENCE_PROVIDER=${HERMES_INFERENCE_PROVIDER:-main}
+      # Explicitly set the provider to 'openai' to use OPENAI_BASE_URL
+      - HERMES_INFERENCE_PROVIDER=${HERMES_INFERENCE_PROVIDER:-openai}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://ollama.com/v1}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       # Default to gemini-3-flash-preview as requested

@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     ripgrep \
     ffmpeg \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm@latest \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -41,8 +41,8 @@ RUN git clone https://github.com/NousResearch/hermes-agent.git .
 RUN uv pip install --system -e ".[all]"
 
 # Install Node.js dependencies (required for browser tools bridge and WhatsApp)
-RUN npm install && \
-    cd scripts/whatsapp-bridge && npm install
+RUN npm install && npm install promise-retry && \
+    cd scripts/whatsapp-bridge && npm install && npm install promise-retry
 
 # NOTE: We specifically skip 'npx playwright install' and system-level browser deps.
 # The agent must be configured to use a remote Playwright endpoint via environment variables.

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   hermes-agent:
     build: .
@@ -44,14 +42,14 @@ services:
       - GATEWAY_ALLOW_ALL_USERS=${GATEWAY_ALLOW_ALL_USERS:-false}
 
   # Playwright Sidecar: Browserless Chrome
-  browserless:
-    image: browserless/chrome:latest
-    restart: unless-stopped
-    environment:
-      - TOKEN=${BROWSERLESS_TOKEN:-}
-      - PREBOOT_CHROME=true
-      - MAX_CONCURRENT_SESSIONS=5
-      - CONNECTION_TIMEOUT=300000
+  #browserless:
+  #  image: browserless/chrome:latest
+  #  restart: unless-stopped
+  #  environment:
+  #    - TOKEN=${BROWSERLESS_TOKEN:-}
+  #    - PREBOOT_CHROME=true
+  #    - MAX_CONCURRENT_SESSIONS=5
+  #    - CONNECTION_TIMEOUT=300000
 
 volumes:
   hermes_data:
